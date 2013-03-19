@@ -407,9 +407,6 @@ public class Minesweeper {
 								g.drawImage(unclicked.getImage(), x*tilesize, y*tilesize, this);
 							}
 						}
-						else if (minematrix[y][x].lastmine) {
-							g.drawImage(redmine.getImage(), x*tilesize, y*tilesize, this);
-						}
 						else {
 							switch (minematrix[y][x].nearby) {
 								case 0: g.drawImage(clicked0.getImage(), x*tilesize, y*tilesize, this); break;
@@ -437,7 +434,7 @@ public class Minesweeper {
 								g.drawImage(unclicked.getImage(), x*tilesize, y*tilesize, this);
 							}
 						}
-						else if (minematrix[x][y].lastmine) {
+						else if (minematrix[y][x].lastmine) {
 							g.drawImage(redmine.getImage(), x*tilesize, y*tilesize, this);
 						}
 						else {
