@@ -13,8 +13,8 @@ import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JMenuBar;
 import javax.swing.JMenu;
+import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.KeyStroke;
@@ -167,45 +167,45 @@ public class Minesweeper {
     void addwarnings() {
         for (int y = 0; y < fieldsize; y++) {
             for (int x = 0; x < fieldsize; x++) {
-                if (minematrix[y][x].mine) {
+                if (minematrix[y][x].isMine()) {
                     if (y - 1 >= 0) {
                         if (x - 1 >= 0) {
-                            if (!minematrix[y - 1][x - 1].mine) {
-                                minematrix[y - 1][x - 1].nearby += 1;
+                            if (!minematrix[y - 1][x - 1].isMine()) {
+                                minematrix[y - 1][x - 1].incrementNearby();
                             }
                         }
                         if (x + 1 < fieldsize) {
-                            if (!minematrix[y - 1][x + 1].mine) {
-                                minematrix[y - 1][x + 1].nearby += 1;
+                            if (!minematrix[y - 1][x + 1].isMine()) {
+                                minematrix[y - 1][x + 1].incrementNearby();
                             }
                         }
-                        if (!minematrix[y - 1][x].mine) {
-                            minematrix[y - 1][x].nearby += 1;
+                        if (!minematrix[y - 1][x].isMine()) {
+                            minematrix[y - 1][x].incrementNearby();
                         }
                     }
                     if (y + 1 < fieldsize) {
                         if (x - 1 >= 0) {
-                            if (!minematrix[y + 1][x - 1].mine) {
-                                minematrix[y + 1][x - 1].nearby += 1;
+                            if (!minematrix[y + 1][x - 1].isMine()) {
+                                minematrix[y + 1][x - 1].incrementNearby();
                             }
                         }
                         if (x + 1 < fieldsize) {
-                            if (!minematrix[y + 1][x + 1].mine) {
-                                minematrix[y + 1][x + 1].nearby += 1;
+                            if (!minematrix[y + 1][x + 1].isMine()) {
+                                minematrix[y + 1][x + 1].incrementNearby();
                             }
                         }
-                        if (!minematrix[y + 1][x].mine) {
-                            minematrix[y + 1][x].nearby += 1;
+                        if (!minematrix[y + 1][x].isMine()) {
+                            minematrix[y + 1][x].incrementNearby();
                         }
                     }
                     if (x - 1 >= 0) {
-                        if (!minematrix[y][x - 1].mine) {
-                            minematrix[y][x - 1].nearby += 1;
+                        if (!minematrix[y][x - 1].isMine()) {
+                            minematrix[y][x - 1].incrementNearby();
                         }
                     }
                     if (x + 1 < fieldsize) {
-                        if (!minematrix[y][x + 1].mine) {
-                            minematrix[y][x + 1].nearby += 1;
+                        if (!minematrix[y][x + 1].isMine()) {
+                            minematrix[y][x + 1].incrementNearby();
                         }
                     }
                 }
@@ -219,10 +219,10 @@ public class Minesweeper {
 
         for (int y = 0; y < fieldsize; y++) {
             for (int x = 0; x < fieldsize; x++) {
-                if (minematrix[y][x].mine) {
+                if (minematrix[y][x].isMine()) {
                     minestring += '*';
                 } else {
-                    minestring += (char) ('0' + minematrix[y][x].nearby);
+                    minestring += (char) ('0' + minematrix[y][x].getNearby());
                 }
             }
             header += y;
@@ -256,8 +256,8 @@ public class Minesweeper {
     }
 
     void flagspace(int row, int col) {
-        minematrix[row][col].flagged = !minematrix[row][col].flagged;
-        if (minematrix[row][col].flagged) {
+        minematrix[row][col].setFlagged(!minematrix[row][col].isFlagged());
+        if (minematrix[row][col].isFlagged()) {
             minesleft--;
         } else {
             minesleft++;
@@ -265,9 +265,9 @@ public class Minesweeper {
     }
 
     void revealspace(int row, int col) {
-        if (!minematrix[row][col].flagged) {
-            minematrix[row][col].show = true;
-            if (!minematrix[row][col].mine && minematrix[row][col].nearby == 0) {
+        if (!minematrix[row][col].isFlagged()) {
+            minematrix[row][col].setShow(true);
+            if (!minematrix[row][col].isMine() && minematrix[row][col].getNearby() == 0) {
                 bfs(row, col);
             }
         }
@@ -282,11 +282,11 @@ public class Minesweeper {
         visited[r][c] = true;
 
         while (!s.isEmpty()) {
-            space = (Space) s.pop();
-            row = space.row;
-            col = space.col;
-            minematrix[row][col].show = true;
-            if (minematrix[row][col].nearby == 0) {
+            space = s.pop();
+            row = space.getRow();
+            col = space.getCol();
+            minematrix[row][col].setShow(true);
+            if (minematrix[row][col].getNearby() == 0) {
                 if (row - 1 >= 0) {
                     if (col - 1 >= 0 && !visited[row - 1][col - 1]) {
                         s.push(minematrix[row - 1][col - 1]);
@@ -340,15 +340,15 @@ public class Minesweeper {
     }
 
     void checkgameover(int row, int col) {
-        if (minematrix[row][col].mine && minematrix[row][col].show) {
+        if (minematrix[row][col].isMine() && minematrix[row][col].isShow()) {
             gameover = true;
             won = false;
-            minematrix[row][col].lastmine = true;
+            minematrix[row][col].setLastMine(true);
         } else {
             int count = 0;
             for (int y = 0; y < fieldsize; y++) {
                 for (int x = 0; x < fieldsize; x++) {
-                    if (minematrix[y][x].flagged || !minematrix[y][x].show) {
+                    if (minematrix[y][x].isFlagged() || !minematrix[y][x].isShow()) {
                         count++;
                     }
                 }
@@ -357,21 +357,6 @@ public class Minesweeper {
                 gameover = true;
                 won = true;
             }
-        }
-    }
-
-    class Space {
-        int nearby, row, col;
-        boolean mine, show, flagged, lastmine;
-
-        Space(boolean m, int n, boolean s, boolean f, int r, int c, boolean l) {
-            mine = m;
-            nearby = n;
-            show = s;
-            flagged = f;
-            row = r;
-            col = c;
-            lastmine = l;
         }
     }
 
@@ -393,18 +378,19 @@ public class Minesweeper {
         ImageIcon clicked7 = new ImageIcon("clicked7.png");
         ImageIcon clicked8 = new ImageIcon("clicked8.png");
 
+        @Override
         protected void paintComponent(Graphics g) {
             if (!gameover) {
                 for (int y = 0; y < fieldsize; y++) {
                     for (int x = 0; x < fieldsize; x++) {
-                        if (!minematrix[y][x].show) {
-                            if (minematrix[y][x].flagged) {
+                        if (!minematrix[y][x].isShow()) {
+                            if (minematrix[y][x].isFlagged()) {
                                 g.drawImage(flag.getImage(), x * tilesize, y * tilesize, this);
                             } else {
                                 g.drawImage(unclicked.getImage(), x * tilesize, y * tilesize, this);
                             }
                         } else {
-                            switch (minematrix[y][x].nearby) {
+                            switch (minematrix[y][x].getNearby()) {
                             case 0:
                                 g.drawImage(clicked0.getImage(), x * tilesize, y * tilesize, this);
                                 break;
@@ -440,16 +426,16 @@ public class Minesweeper {
             if (gameover && !won) {
                 for (int y = 0; y < fieldsize; y++) {
                     for (int x = 0; x < fieldsize; x++) {
-                        if (!minematrix[y][x].show) {
-                            if (minematrix[y][x].mine) {
+                        if (!minematrix[y][x].isShow()) {
+                            if (minematrix[y][x].isMine()) {
                                 g.drawImage(mine.getImage(), x * tilesize, y * tilesize, this);
                             } else {
                                 g.drawImage(unclicked.getImage(), x * tilesize, y * tilesize, this);
                             }
-                        } else if (minematrix[y][x].lastmine) {
+                        } else if (minematrix[y][x].isLastMine()) {
                             g.drawImage(redmine.getImage(), x * tilesize, y * tilesize, this);
                         } else {
-                            switch (minematrix[y][x].nearby) {
+                            switch (minematrix[y][x].getNearby()) {
                             case 0:
                                 g.drawImage(clicked0.getImage(), x * tilesize, y * tilesize, this);
                                 break;
@@ -484,10 +470,10 @@ public class Minesweeper {
             } else if (gameover && won) {
                 for (int y = 0; y < fieldsize; y++) {
                     for (int x = 0; x < fieldsize; x++) {
-                        if (minematrix[y][x].mine) {
+                        if (minematrix[y][x].isMine()) {
                             g.drawImage(flag.getImage(), x * tilesize, y * tilesize, this);
                         } else {
-                            switch (minematrix[y][x].nearby) {
+                            switch (minematrix[y][x].getNearby()) {
                             case 0:
                                 g.drawImage(clicked0.getImage(), x * tilesize, y * tilesize, this);
                                 break;
@@ -525,19 +511,24 @@ public class Minesweeper {
 
     class BoardMouseListener implements MouseListener {
 
+        @Override
         public void mouseClicked(MouseEvent e) {
             processclick(e);
         }
 
+        @Override
         public void mouseEntered(MouseEvent e) {
         }
 
+        @Override
         public void mouseExited(MouseEvent e) {
         }
 
+        @Override
         public void mousePressed(MouseEvent e) {
         }
 
+        @Override
         public void mouseReleased(MouseEvent e) {
         }
 
@@ -545,6 +536,7 @@ public class Minesweeper {
 
     class MenuActionListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == newgame) {
                 // System.out.println("Would start new game.");
