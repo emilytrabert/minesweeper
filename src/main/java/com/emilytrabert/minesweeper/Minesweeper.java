@@ -1,5 +1,9 @@
 package com.emilytrabert.minesweeper;
 
+import static com.emilytrabert.minesweeper.Difficulty.EASY;
+import static com.emilytrabert.minesweeper.Difficulty.HARD;
+import static com.emilytrabert.minesweeper.Difficulty.MEDIUM;
+
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -33,14 +37,14 @@ public class Minesweeper {
     boolean gameover, won;
     int fieldsize, minenumber, windowsize, tilesize, minesleft;
 
-    String difficulty;
+    Difficulty difficulty;
     JFrame frame;
     JMenuBar menubar;
     JMenuItem newgame;
     JRadioButtonMenuItem easy, medium, hard;
 
     public Minesweeper() {
-        difficulty = "easy";
+        difficulty = EASY;
 
         menubar = new JMenuBar();
         frame = new JFrame("Minesweeper");
@@ -98,18 +102,9 @@ public class Minesweeper {
 
     void newgame() {
         tilesize = 16;
-        if (difficulty == "easy") {
-            fieldsize = 9;
-            minenumber = 10;
-        } else if (difficulty == "medium") {
-            fieldsize = 16;
-            minenumber = 40;
-        }
+        fieldsize = difficulty.getFieldSize();
+        minenumber = difficulty.getMineCount();
 
-        else if (difficulty == "hard") {
-            fieldsize = 22;
-            minenumber = 99;
-        }
         gameover = false;
         won = false;
         minesleft = minenumber;
@@ -544,15 +539,15 @@ public class Minesweeper {
                 boardcomponent.repaint();
             } else if (e.getSource() == easy) {
                 // System.out.println("Would start new easy game.");
-                difficulty = "easy";
+                difficulty = EASY;
                 newgame();
             } else if (e.getSource() == medium) {
                 // System.out.println("Would start new medium game.");
-                difficulty = "medium";
+                difficulty = MEDIUM;
                 newgame();
             } else if (e.getSource() == hard) {
                 // System.out.println("Would start new hard game.");
-                difficulty = "hard";
+                difficulty = HARD;
                 newgame();
             }
         }
